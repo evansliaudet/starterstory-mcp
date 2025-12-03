@@ -7,11 +7,9 @@ import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-// --- Initializations ---
 const app = express();
 app.use(express.json());
 
-// Load keys from environment variables
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SECRET_SUPABASE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -114,17 +112,13 @@ app.post("/mcp", async (req, res) => {
 });
 
 async function main() {
-  // Check for a flag to decide which mode to run
   const isStdio = process.argv.includes("--stdio");
 
   if (isStdio) {
-    // MODE 1: Stdio (For Claude Desktop)
-    // In this mode, we cannot use console.log for info, only console.error
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error("MCP Server running in stdio mode");
   } else {
-    // MODE 2: HTTP (For testing with Curl)
     app.post("/mcp", async (req, res) => {
       try {
         const transport = new StreamableHTTPServerTransport({
